@@ -1,0 +1,15 @@
+pandas~=1.2.4
+numpy~=1.19.2
+matplotlib~=3.3.4
+seaborn~=0.11.1
+scikit-learn~=0.24.2
+influxdb~=5.3.1
+pyspark~=3.1.1
+glob2~=0.7
+cassandra-driver~=3.25.0
+py4j~=0.10.9
+scipy~=1.6.2
+pyarrow~=3.0.0
+logging~=0.4.9.6
+zlib~=1.2.11
+setuptools~=52.0.0
