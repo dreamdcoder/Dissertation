@@ -13,7 +13,7 @@ os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka
 
 REST_API_URL= 'https://api.powerbi.com/beta/c8eca3ca-1276-46d5-9d9d-a0f2a028920f/datasets/ca1ec1f2-7942-43cf-af78-32a609c6c644/rows?key=2tglB3k%2BwTqLuZkyXLiKqiaMDVmeynoIQS9%2FGCBh1MjwdHGkiQPeRkSf68i%2BEMjz%2FD8ui20%2B0JMJ2VWa4zsPQw%3D%3D'
 
-# Build a spark session
+#Build a spark session
 spark = SparkSession \
     .builder \
     .appName("network") \
