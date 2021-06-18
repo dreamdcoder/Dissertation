@@ -11,7 +11,7 @@ import requests
 # set Environment parameter (optional)'''
 os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.0.1'
 
-REST_API_URL= 'https://api.powerbi.com/beta/c8eca3ca-1276-46d5-9d9d-a0f2a028920f/datasets/ca1ec1f2-7942-43cf-af78-32a609c6c644/rows?key=2tglB3k%2BwTqLuZkyXLiKqiaMDVmeynoIQS9%2FGCBh1MjwdHGkiQPeRkSf68i%2BEMjz%2FD8ui20%2B0JMJ2VWa4zsPQw%3D%3D'
+REST_API_URL= 'https://api.powerbi.com/beta/c8eca3ca-1276-46d5-9d9d-a0f2a028920f/datasets/b95e3666-7d39-4faf-b49a-aad8879f1021/rows?key=GMq1fua6vtBWckini28U0Lw06se3xhcvV4LgxZ1jJW%2F7jcki33AoqGsJXDZDXce%2BRbSacaSBi49acMNkDmNHNA%3D%3D'
 
 #Build a spark session
 spark = SparkSession \
@@ -75,13 +75,14 @@ def process_row(row):
 
     # scaler = joblib.load('C:\\Users\\yogeshja\\Desktop\\Dissertation\\leaf1_scaler.sav')
     scaler = pickle.load(open('C:\\Users\\yogeshja\\Desktop\\Dissertation\\leaf1_scaler.pkl', 'rb'))
-    # print(df["key"])
+    print(df["key"])
     df_new = df.drop(['key', 'time'], axis=1)
     df_new_scaled = scaler.transform(df_new)
-    data_json = bytes(df.to_json(orient='records', date_format='iso', date_unit='ms'),encoding='utf-8')
-    req=requests.put(REST_API_URL,data_json)
-
-    print(data_json)
+    #df_dummy=
+    #data_json = bytes(df.to_json(orient='records', date_format='iso', date_unit='ms'),encoding='utf-8')
+    #req =requests.put(REST_API_URL,data_json)
+    #print(req.text)
+    #print(data_json)
 
 
 query = raw_df \
