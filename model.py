@@ -23,7 +23,7 @@ def create_model(node_name):
     pd.set_option('display.width', 1000)
 
     # instantiate data object
-    node_name = 'leaf1'
+
     d = data()
     # data ingestion
     df = d.read_data(node_name)
@@ -41,21 +41,23 @@ def create_model(node_name):
     '''create a  pikle file for scaler'''
     scaler_file_name = node_name + "_scaler.pkl"
 
-    spath=os.path.join(path, scaler_file_name)
+    spath = os.path.join(path, scaler_file_name)
     # joblib.dump(scaler, file_name)
     with open(spath, 'wb') as f:
-         dump(scaler, f)
+        dump(scaler, f)
 
-    #dump(scaler, open(scaler_file_name, 'wb'))
     '''create model'''
     ilf = IsolationForest(n_estimators=100, contamination=0.01)
     ilf.fit(scaled_df)
     model_file_name = node_name + "_model.pkl"
     mpath = os.path.join(path, model_file_name)
     with open(mpath, 'wb') as f:
-         dump(ilf, f)
-
+        dump(ilf, f)
 
 
 if __name__ == "__main__":
-    create_model('leaf1')
+    d = data()
+    nodes = d.get_nodes()
+    for node in nodes:
+        create_model(node)
+        print("model created for {}".format(node))

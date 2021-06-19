@@ -79,10 +79,23 @@ class data:
             rows = [tuple(x) for x in df.values]
             for row in rows:
                 self.insert_record(row)
-        self.session.shutdown()
+
 
     def pandas_factory(self, colnames, rows):
         return pd.DataFrame(rows, columns=colnames)
+
+    def close_session(self):
+        self.session.shutdown()
+
+    def get_nodes(self):
+        self.session.row_factory = self.pandas_factory
+        self.session.default_fetch_size = None
+        query = """select distinct node_name from dataplane;"""
+        # print(query)
+        rslt = self.session.execute(query, timeout=None)
+        df = rslt._current_rows
+        node_list=list(df.iloc[:,0])
+        return node_list
 
     def read_data(self, node_name):
         self.session.row_factory = self.pandas_factory

@@ -1,18 +1,22 @@
+"""
+spark_processing.py
+1.Reads data from kafka in a structured streaming format to spark DF
+2.Perform data preprocessing
+3.Apply ML Model on data.
+"""
+
 # Import Libraries
 import os
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import from_json
-import json
 import pickle
 import pandas as pd
 from pyspark.sql.types import StructType, IntegerType, DoubleType, StringType, TimestampType
-import requests
 
 # set Environment parameter (optional)'''
 os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.0.1'
 global path
 path = os.getcwd() + '\model'
-REST_API_URL = 'https://api.powerbi.com/beta/c8eca3ca-1276-46d5-9d9d-a0f2a028920f/datasets/b95e3666-7d39-4faf-b49a-aad8879f1021/rows?key=GMq1fua6vtBWckini28U0Lw06se3xhcvV4LgxZ1jJW%2F7jcki33AoqGsJXDZDXce%2BRbSacaSBi49acMNkDmNHNA%3D%3D'
 
 # Build a spark session
 spark = SparkSession \
@@ -35,7 +39,7 @@ user_schema = StructType() \
     .add("vrf_path_count", DoubleType()) \
     .add("vrf_update_messages_received", DoubleType())
 
-# read stream from kafka topic customer_location
+# read stream from kafka topic data_plane
 df = spark \
     .readStream \
     .format("kafka") \
@@ -54,8 +58,8 @@ jsonOptions = {"timestampFormat": TimestampFormat}
 raw_df = raw_df.withColumn("value", from_json(col="value", schema=user_schema, options=jsonOptions)).select("value.*")
 
 
+# Function to process each row
 def process_row(row):
-    print('------------------------------------------------------------')
     cols = ['key', 'time', 'active-routes-count', 'backup_routes_count', 'deleted_routes_count', 'paths_count',
             'performance_stat_global_config_items_processed',
             'performance_stat_vrf_inbound_update_messages',
@@ -71,9 +75,9 @@ def process_row(row):
                     'performance_stat_vrf_inbound_update_messages': 'float64',
                     'protocol_route_memory': 'float64', 'total_neighbors_count': 'float64',
                     'vrf_path_count': 'float64', 'vrf_update_messages_received': 'float64'})
-    node_name =df["key"][0]
+    node_name = df["key"][0]
     # load scaler file
-    print(type(node_name),node_name)
+    print(type(node_name), node_name)
     scaler_file_name = node_name + "_scaler.pkl"
     spath = os.path.join(path, scaler_file_name)
     with open(spath, 'rb') as f:
@@ -85,17 +89,11 @@ def process_row(row):
     with open(mpath, 'rb') as f:
         model = pickle.load(f)
 
-    # scaler = pickle.load(open('C:\\Users\\yogeshja\\Desktop\\Dissertation\\leaf1_scaler.pkl', 'rb'))
-
     df_new = df.drop(['key', 'time'], axis=1)
     df_new_scaled = scaler.transform(df_new)
     y_pred_outliers = model.predict(df_new_scaled)
+    df['Anamoly'] = pd.Series(y_pred_outliers).replace({-1:0})
     print(type(y_pred_outliers), y_pred_outliers)
-    # df_dummy=
-    # data_json = bytes(df.to_json(orient='records', date_format='iso', date_unit='ms'),encoding='utf-8')
-    # req =requests.put(REST_API_URL,data_json)
-    # print(req.text)
-    # print(data_json)
 
 
 query = raw_df \
