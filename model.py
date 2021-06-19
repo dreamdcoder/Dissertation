@@ -9,26 +9,53 @@ from sklearn.cluster import DBSCAN
 from sklearn import metrics
 from cassandra_data_mgmt import data
 from pickle import dump
+from sklearn.ensemble import IsolationForest
 import joblib
+import os
 
-# Set Pandas Dataframe Display Options
-pd.set_option('display.max_rows', 500)
-pd.set_option('display.max_columns', 500)
-pd.set_option('display.width', 1000)
 
-# instantiate data object
-d = data()
-df = d.read_data('leaf1')
+def create_model(node_name):
+    path = os.getcwd() + '\model'
 
-# print(df)
+    # Set Pandas Dataframe Display Options
+    pd.set_option('display.max_rows', 500)
+    pd.set_option('display.max_columns', 500)
+    pd.set_option('display.width', 1000)
 
-df_new = df.drop(['node_name', 'time'], axis=1)
+    # instantiate data object
+    node_name = 'leaf1'
+    d = data()
+    # data ingestion
+    df = d.read_data(node_name)
+    # print(df)
 
-scaler = MinMaxScaler()
+    # data preprocessing
+    df_new = df.drop(['node_name', 'time'], axis=1)
 
-scaler.fit(df_new)
-scaled_df = scaler.transform(df_new)
-file_name="leaf1_scaler.sav"
-joblib.dump(scaler,file_name)
-#dump(scaler, open("leaf1_scaler.pkl", 'wb'))
-print(scaled_df)
+    # data normalization
+    scaler = MinMaxScaler()
+
+    scaler.fit(df_new)
+    scaled_df = scaler.transform(df_new)
+
+    '''create a  pikle file for scaler'''
+    scaler_file_name = node_name + "_scaler.pkl"
+
+    spath=os.path.join(path, scaler_file_name)
+    # joblib.dump(scaler, file_name)
+    with open(spath, 'wb') as f:
+         dump(scaler, f)
+
+    #dump(scaler, open(scaler_file_name, 'wb'))
+    '''create model'''
+    ilf = IsolationForest(n_estimators=100, contamination=0.01)
+    ilf.fit(scaled_df)
+    model_file_name = node_name + "_model.pkl"
+    mpath = os.path.join(path, model_file_name)
+    with open(mpath, 'wb') as f:
+         dump(ilf, f)
+
+
+
+if __name__ == "__main__":
+    create_model('leaf1')

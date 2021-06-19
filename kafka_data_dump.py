@@ -8,7 +8,6 @@ from data_gen import DataGen
 from kafka.errors import KafkaError
 
 
-
 def create_topic(topic_name):
     # create a consumer object
     consumer = KafkaConsumer(bootstrap_servers="localhost:9092")
@@ -46,6 +45,5 @@ if __name__ == "__main__":
     while 1 == 1:
         record = leaf1.prepare_record()
         print(record)
-        producer.send("data_plane",key=bytes(record["key"],'utf-8'), value=record)
+        producer.send("data_plane", key=bytes(record["key"], 'utf-8'), value=record)
         time.sleep(100)
-

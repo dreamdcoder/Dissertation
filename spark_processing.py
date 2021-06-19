@@ -10,10 +10,11 @@ import requests
 
 # set Environment parameter (optional)'''
 os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.0.1'
+global path
+path = os.getcwd() + '\model'
+REST_API_URL = 'https://api.powerbi.com/beta/c8eca3ca-1276-46d5-9d9d-a0f2a028920f/datasets/b95e3666-7d39-4faf-b49a-aad8879f1021/rows?key=GMq1fua6vtBWckini28U0Lw06se3xhcvV4LgxZ1jJW%2F7jcki33AoqGsJXDZDXce%2BRbSacaSBi49acMNkDmNHNA%3D%3D'
 
-REST_API_URL= 'https://api.powerbi.com/beta/c8eca3ca-1276-46d5-9d9d-a0f2a028920f/datasets/b95e3666-7d39-4faf-b49a-aad8879f1021/rows?key=GMq1fua6vtBWckini28U0Lw06se3xhcvV4LgxZ1jJW%2F7jcki33AoqGsJXDZDXce%2BRbSacaSBi49acMNkDmNHNA%3D%3D'
-
-#Build a spark session
+# Build a spark session
 spark = SparkSession \
     .builder \
     .appName("network") \
@@ -54,8 +55,6 @@ raw_df = raw_df.withColumn("value", from_json(col="value", schema=user_schema, o
 
 
 def process_row(row):
-
-
     print('------------------------------------------------------------')
     cols = ['key', 'time', 'active-routes-count', 'backup_routes_count', 'deleted_routes_count', 'paths_count',
             'performance_stat_global_config_items_processed',
@@ -72,17 +71,31 @@ def process_row(row):
                     'performance_stat_vrf_inbound_update_messages': 'float64',
                     'protocol_route_memory': 'float64', 'total_neighbors_count': 'float64',
                     'vrf_path_count': 'float64', 'vrf_update_messages_received': 'float64'})
+    node_name =df["key"][0]
+    # load scaler file
+    print(type(node_name),node_name)
+    scaler_file_name = node_name + "_scaler.pkl"
+    spath = os.path.join(path, scaler_file_name)
+    with open(spath, 'rb') as f:
+        scaler = pickle.load(f)
 
-    # scaler = joblib.load('C:\\Users\\yogeshja\\Desktop\\Dissertation\\leaf1_scaler.sav')
-    scaler = pickle.load(open('C:\\Users\\yogeshja\\Desktop\\Dissertation\\leaf1_scaler.pkl', 'rb'))
-    print(df["key"])
+    # load model file
+    model_file_name = node_name + "_model.pkl"
+    mpath = os.path.join(path, model_file_name)
+    with open(mpath, 'rb') as f:
+        model = pickle.load(f)
+
+    # scaler = pickle.load(open('C:\\Users\\yogeshja\\Desktop\\Dissertation\\leaf1_scaler.pkl', 'rb'))
+
     df_new = df.drop(['key', 'time'], axis=1)
     df_new_scaled = scaler.transform(df_new)
-    #df_dummy=
-    #data_json = bytes(df.to_json(orient='records', date_format='iso', date_unit='ms'),encoding='utf-8')
-    #req =requests.put(REST_API_URL,data_json)
-    #print(req.text)
-    #print(data_json)
+    y_pred_outliers = model.predict(df_new_scaled)
+    print(type(y_pred_outliers), y_pred_outliers)
+    # df_dummy=
+    # data_json = bytes(df.to_json(orient='records', date_format='iso', date_unit='ms'),encoding='utf-8')
+    # req =requests.put(REST_API_URL,data_json)
+    # print(req.text)
+    # print(data_json)
 
 
 query = raw_df \

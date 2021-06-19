@@ -13,3 +13,6 @@ pyarrow~=3.0.0
 logging~=0.4.9.6
 zlib~=1.2.11
 setuptools~=52.0.0
+flask~=1.1.2
+joblib~=1.0.1
+requests~=2.25.1
