@@ -1,3 +1,4 @@
+""" data_gen.py for generating data for streaming purpose"""
 from datetime import datetime
 
 
@@ -10,6 +11,10 @@ class DataGen:
         self.node_name = node_name
 
     def prepare_record(self):
+        """
+        generates data in json format
+        :return:
+        """
         active_routes_count = 0
         backup_routes_count = 0
         deleted_routes_count = 0

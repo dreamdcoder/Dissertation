@@ -1,3 +1,7 @@
+"""
+cassandra_data_mgmt.py for managing cassandra opertaions
+"""
+
 from cassandra.cluster import Cluster
 from pyspark.sql import SparkSession
 from pyspark import SparkContext, SparkConf

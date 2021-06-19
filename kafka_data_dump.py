@@ -1,3 +1,6 @@
+"""
+kafka_data_dump.py is a kafka producer for dumping data in kafka topic
+"""
 from datetime import datetime
 from random import randrange
 from kafka import KafkaConsumer, KafkaProducer

@@ -1,3 +1,6 @@
+"""
+model.py creates model for machine learning
+"""
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,8 +18,12 @@ import os
 
 
 def create_model(node_name):
+    '''
+    creates and saves pickle files for model and scaler
+    :param node_name:
+    :return:
+    '''
     path = os.getcwd() + '\model'
-
     # Set Pandas Dataframe Display Options
     pd.set_option('display.max_rows', 500)
     pd.set_option('display.max_columns', 500)
@@ -34,21 +41,20 @@ def create_model(node_name):
 
     # data normalization
     scaler = MinMaxScaler()
-
     scaler.fit(df_new)
     scaled_df = scaler.transform(df_new)
 
-    '''create a  pikle file for scaler'''
+    #create a pickle file for scaler
     scaler_file_name = node_name + "_scaler.pkl"
 
     spath = os.path.join(path, scaler_file_name)
-    # joblib.dump(scaler, file_name)
     with open(spath, 'wb') as f:
         dump(scaler, f)
 
-    '''create model'''
+    #create model
     ilf = IsolationForest(n_estimators=100, contamination=0.01)
     ilf.fit(scaled_df)
+    #create a pickle file for scaler
     model_file_name = node_name + "_model.pkl"
     mpath = os.path.join(path, model_file_name)
     with open(mpath, 'wb') as f:
