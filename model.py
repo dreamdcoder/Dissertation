@@ -13,7 +13,6 @@ from sklearn import metrics
 from cassandra_data_mgmt import data
 from pickle import dump
 from sklearn.ensemble import IsolationForest
-import joblib
 import os
 
 
