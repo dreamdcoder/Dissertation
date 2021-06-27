@@ -15,18 +15,18 @@ class DataGen:
         generates data in json format
         :return:
         """
-        active_routes_count = 0
-        backup_routes_count = 0
-        deleted_routes_count = 0
-        paths_count = 0
-        performance_stat_global_config_items_processed = 0
-        performance_stat_vrf_inbound_update_messages = 0
-        protocol_route_memory = 0
-        total_neighbors_count = 0
-        vrf_path_count = 0
-        vrf_update_messages_received = 0
+        active_routes_count = 191.0
+        backup_routes_count = 1.0
+        deleted_routes_count = 0.0
+        paths_count = 1282.0
+        protocol_route_memory = 168160.0
+        total_neighbors_count = 40.0
+        performance_stat_global_config_items_processed = 7.0
+        performance_stat_vrf_inbound_update_messages = 106484.0
+        vrf_path_count = 6140.0
+        vrf_update_messages_received = 106484.0
         event_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-        return {"key": self.node_name, "time": event_time, "active-routes-count": active_routes_count,
+        return {"key": self.node_name, "time": event_time, "active_routes_count": active_routes_count,
                 "backup_routes_count": backup_routes_count, "deleted_routes_count": deleted_routes_count,
                 "paths_count": paths_count,
                 "performance_stat_global_config_items_processed": performance_stat_global_config_items_processed,
