@@ -38,14 +38,19 @@ def json_serializer(data):
     return json.dumps(data).encode("utf-8")
 
 
-producer = KafkaProducer(bootstrap_servers=['localhost:9092'], value_serializer=json_serializer)
+producer_leaf1 = KafkaProducer(bootstrap_servers=['localhost:9092'], value_serializer=json_serializer)
+producer_leaf2 = KafkaProducer(bootstrap_servers=['localhost:9092'], value_serializer=json_serializer)
 
 if __name__ == "__main__":
     create_topic('data_plane')
     leaf1 = DataGen('leaf1')
+    leaf2 = DataGen('leaf2')
 
     while 1 == 1:
-        record = leaf1.prepare_record()
-        print(record)
-        producer.send("data_plane", key=bytes(record["key"], 'utf-8'), value=record)
+        record_leaf1 = leaf1.prepare_record()
+        record_leaf2 = leaf2.prepare_record()
+        #print(record)
+        producer_leaf1.send("data_plane", key=bytes(record_leaf1["key"], 'utf-8'), value=record_leaf1)
+        producer_leaf2.send("data_plane", key=bytes(record_leaf2["key"], 'utf-8'), value=record_leaf2)
+
         time.sleep(100)

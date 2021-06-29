@@ -38,16 +38,16 @@ def udf_ml_model(feat1, feat2, feat3, feat4, feat5, feat6, feat7, feat8, feat9, 
                     'performance_stat_vrf_inbound_update_messages': 'float64',
                     'protocol_route_memory': 'float64', 'total_neighbors_count': 'float64',
                     'vrf_path_count': 'float64', 'vrf_update_messages_received': 'float64'})
-    node_name = df["key"][0]
+    key = df["key"][0]
     # load scaler file
-    print(type(node_name), node_name)
-    scaler_file_name = node_name + "_scaler.pkl"
+    #print(type(key), key)
+    scaler_file_name = key + "_scaler.pkl"
     spath = os.path.join(path, scaler_file_name)
     with open(spath, 'rb') as f:
         scaler = pickle.load(f)
 
     # load model file
-    model_file_name = node_name + "_model.pkl"
+    model_file_name = key + "_model.pkl"
     mpath = os.path.join(path, model_file_name)
     with open(mpath, 'rb') as f:
         model = pickle.load(f)
@@ -102,17 +102,17 @@ raw_df = raw_df.withColumn("value", from_json(col="value", schema=user_schema, o
 # register User defined function get_distance()
 udf_ml_model = udf(udf_ml_model, IntegerType())
 raw_df = raw_df.withColumn('Anomaly',
-                               udf_ml_model(raw_df.key, raw_df.time, raw_df.active_routes_count,
-                                            raw_df.backup_routes_count,
-                                            raw_df.deleted_routes_count, raw_df.paths_count,
-                                            raw_df.performance_stat_global_config_items_processed,
-                                            raw_df.performance_stat_vrf_inbound_update_messages,
-                                            raw_df.protocol_route_memory, raw_df.total_neighbors_count,
-                                            raw_df.vrf_path_count, raw_df.vrf_update_messages_received))
+                           udf_ml_model(raw_df.key, raw_df.time, raw_df.active_routes_count,
+                                        raw_df.backup_routes_count,
+                                        raw_df.deleted_routes_count, raw_df.paths_count,
+                                        raw_df.performance_stat_global_config_items_processed,
+                                        raw_df.performance_stat_vrf_inbound_update_messages,
+                                        raw_df.protocol_route_memory, raw_df.total_neighbors_count,
+                                        raw_df.vrf_path_count, raw_df.vrf_update_messages_received))
 
 
 # Function to process each row
-def process_row(batch_df,epoch_id):
+def process_row(batch_df, epoch_id):
     if not batch_df.rdd.isEmpty():
         batch_df.write \
             .format("jdbc") \
@@ -120,7 +120,15 @@ def process_row(batch_df,epoch_id):
             .option("dbtable", "public.data_plane") \
             .option("user", "postgres") \
             .option("password", "123456") \
-            .mode("append")\
+            .mode("append") \
+            .save()
+
+        batch_df.select(batch_df.columns[:12]) \
+            .withColumnRenamed("key", "node_name")\
+            .write \
+            .format("org.apache.spark.sql.cassandra") \
+            .mode('append') \
+            .options(table="dataplane", keyspace="dissertation") \
             .save()
 
 
@@ -129,7 +137,6 @@ query = raw_df \
     .trigger(processingTime='10 seconds') \
     .foreachBatch(process_row) \
     .start()
-
 
 '''query = raw_df \
     .writeStream \
