@@ -7,13 +7,17 @@ from cassandra.query import SimpleStatement
 import pandas as pd
 import os
 import glob2
+import json
 
 
 class data:
     def __init__(self):
-        self.cluster = Cluster(['127.0.0.1'], connect_timeout=9999)
+        self.config = json.load(open('config.json'))
+        cluster_ips= self.config['cassandra']['cluster_ips']
+        keyspace = self.config['cassandra']['keyspace']
+        self.cluster = Cluster(cluster_ips, connect_timeout=9999)
         self.session = self.cluster.connect()
-        self.keyspace = 'dissertation'
+        self.keyspace = keyspace
         self.create_keyspace()
         self.session.set_keyspace(self.keyspace)
 
@@ -59,7 +63,8 @@ class data:
                        'vrf__update-messages-received']
 
         # get path of data sets
-        path = os.getcwd() + '\data'
+        #path = os.getcwd() + '\data'
+        path = os.getcwd() + self.config['cassandra']['data_path']
 
         # returns all file having pattern from a path provided
         csv_files = glob2.glob(os.path.join(path, "*.csv"))
@@ -99,11 +104,12 @@ class data:
         node_list=list(df.iloc[:,0])
         return node_list
 
-    def read_data(self, node_name):
+    def read_data(self, node_name,table_name):
         self.session.row_factory = self.pandas_factory
         self.session.default_fetch_size = None
-        query = """select * from dataplane where node_name='{}';""".format(node_name)
+        query = """select * from {} where node_name='{}';""".format(table_name,node_name)
         #print(query)
         rslt = self.session.execute(query, timeout=None)
         df = rslt._current_rows
         return df
+

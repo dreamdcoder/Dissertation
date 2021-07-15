@@ -1,6 +1,6 @@
 """ data_gen.py for generating data for streaming purpose"""
 from datetime import datetime
-
+import json
 
 class DataGen:
     def __init__(self, key):
@@ -17,7 +17,7 @@ class DataGen:
         """
         active_routes_count = 11.0
         backup_routes_count = 0.0
-        deleted_routes_count = 0.0
+        deleted_routes_count = 9.0
         paths_count = 1282.0
         protocol_route_memory = 168160.0
         total_neighbors_count = 0.0

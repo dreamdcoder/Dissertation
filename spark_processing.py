@@ -13,11 +13,15 @@ import pickle
 import pandas as pd
 from pyspark.sql.types import StructType, IntegerType, DoubleType, StringType, TimestampType
 from pyspark.sql.functions import udf
+import json
+#from solution import get_solution
+from cassandra_data_mgmt import data
 
 # set Environment parameter (optional)'''
 os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.0.1'
 global path
 path = os.getcwd() + '\model'
+
 
 
 #
@@ -57,7 +61,23 @@ def udf_ml_model(feat1, feat2, feat3, feat4, feat5, feat6, feat7, feat8, feat9, 
     df_new_scaled = scaler.transform(df_new)
     # apply model
     y_pred_outliers = model.predict(df_new_scaled)
+    #if y_pred_outliers == -1:
+        #solution= get_solution(key,'BGP Anomaly')
     return int(y_pred_outliers)
+
+def udf_solution(key,anomaly):
+    solution = '-'
+    if anomaly == -1:
+        d = data()
+        df = d.read_data(key, 'knowledge_base')
+        top_solution = df[df.success_rate == df.success_rate.max()]
+        d.close_session()
+        #print(top_solution.solution)
+        solution= top_solution.solution.to_string(index=False)
+        print(solution)
+    return solution
+
+
 
 
 # Build a spark session
@@ -101,7 +121,8 @@ raw_df = raw_df.withColumn("value", from_json(col="value", schema=user_schema, o
 
 # register User defined function get_distance()
 udf_ml_model = udf(udf_ml_model, IntegerType())
-raw_df = raw_df.withColumn('Anomaly',
+udf_solution = udf(udf_solution, StringType())
+raw_df = raw_df.withColumn('anomaly',
                            udf_ml_model(raw_df.key, raw_df.time, raw_df.active_routes_count,
                                         raw_df.backup_routes_count,
                                         raw_df.deleted_routes_count, raw_df.paths_count,
@@ -110,6 +131,7 @@ raw_df = raw_df.withColumn('Anomaly',
                                         raw_df.protocol_route_memory, raw_df.total_neighbors_count,
                                         raw_df.vrf_path_count, raw_df.vrf_update_messages_received))
 
+raw_df = raw_df.withColumn('solution',udf_solution(raw_df.key,raw_df.anomaly))
 
 # Function to process each row
 def process_row(batch_df, epoch_id):

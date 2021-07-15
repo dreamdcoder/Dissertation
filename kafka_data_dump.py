@@ -8,7 +8,7 @@ import json
 import time
 from data_gen import DataGen
 from kafka.errors import KafkaError
-
+import json
 
 def create_topic(topic_name):
     # create a consumer object

@@ -6,5 +6,6 @@
     <content url="jar://C:/project/spark/python/lib/py4j-0.10.9-src.zip!/" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="Hackerrank" />
   </component>
 </module>

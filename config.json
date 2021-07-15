@@ -1,0 +1,61 @@
+{
+    "nodes":[
+		"leaf1", "leaf2", "leaf3",
+		"leaf5", "leaf6", "leaf7", "leaf8",
+		"spine1", "spine2", "spine3", "spine4"
+	],
+	"featureModel":"DataPlane",
+	"featureList": [
+		"active_routes_count",
+		"backup_routes_count",
+		"deleted_routes_count",
+		"paths_count",
+		"protocol_route_memory",
+		"total_neighbors_count",
+		"performance_stat_global_config_items_processed",
+		"performance_stat_vrf_inbound_update_messages",
+		"vrf_path_count",
+		"vrf_update_messages_received"
+		],
+
+    "kafka": {
+        "bootstrap_servers": "localhost:9092",
+        "client_id" : "test",
+        "topic" : "data_plane"
+    },
+
+  "postgres": {
+    "url":"jdbc:postgresql://localhost:5433/postgres",
+    "dbtable": "public.data_plane",
+    "user":"postgres",
+    "password":"123456"
+  },
+
+  "cassandra": {
+    "cluster_ips": ["127.0.0.1"],
+    "data_path" : "/data",
+    "keyspace": "dissertation",
+    "dbtable": "dataplane",
+    "class": "SimpleStrategy",
+    "replication_factor": "2"
+  },
+  "dataset":{
+		"availableDataset": [
+			"bgpclear_first",
+			"bgpclear_second",
+			"portflap_first",
+			"bgpclear_apptraffic_2hourRun",
+			"bgpclear_no_traffic_2hourRun",
+			"bgpclearNewNet"
+		],
+		"list":[
+			"bgpclear_apptraffic_2hourRun"
+		],
+		"path": "/Data"
+  },
+	"ml": {
+		"model_path": "/model",
+		"n_estimators":100,
+        "contamination":0.01
+	}
+}

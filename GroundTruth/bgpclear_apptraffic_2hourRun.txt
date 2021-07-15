@@ -1,0 +1,2 @@
+Node,Host,Start,End,Event,Type
+leaf1,None,1519094546,1519094846,clearBGP,single
