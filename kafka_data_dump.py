@@ -4,11 +4,12 @@ kafka_data_dump.py is a kafka producer for dumping data in kafka topic
 
 from kafka import KafkaConsumer, KafkaProducer
 from kafka.admin import KafkaAdminClient, NewTopic
-import json
+
 import time
 from data_gen import DataGen
 from kafka.errors import KafkaError
 import json
+import sys
 
 def create_topic(topic_name):
     # create a consumer object
@@ -39,18 +40,19 @@ def json_serializer(data):
 
 
 producer_leaf1 = KafkaProducer(bootstrap_servers=['localhost:9092'], value_serializer=json_serializer)
-producer_leaf2 = KafkaProducer(bootstrap_servers=['localhost:9092'], value_serializer=json_serializer)
+#producer_leaf2 = KafkaProducer(bootstrap_servers=['localhost:9092'], value_serializer=json_serializer)
 
 if __name__ == "__main__":
     create_topic('data_plane')
-    leaf1 = DataGen('leaf1')
-    leaf2 = DataGen('leaf2')
+    key = sys.argv[1]
+    leaf1 = DataGen(key)
+    #leaf2 = DataGen('leaf2')
 
     while 1 == 1:
         record_leaf1 = leaf1.prepare_record()
-        record_leaf2 = leaf2.prepare_record()
-        #print(record)
+        #record_leaf2 = leaf2.prepare_record()
+        print(record_leaf1)
         producer_leaf1.send("data_plane", key=bytes(record_leaf1["key"], 'utf-8'), value=record_leaf1)
-        producer_leaf2.send("data_plane", key=bytes(record_leaf2["key"], 'utf-8'), value=record_leaf2)
+        #producer_leaf2.send("data_plane", key=bytes(record_leaf2["key"], 'utf-8'), value=record_leaf2)
 
-        time.sleep(100)
+        time.sleep(10)

@@ -6,6 +6,8 @@ import glob2
 config = json.load(open('config.json'))
 print(config['cassandra']['data_path'])
 path = os.getcwd() + config['cassandra']['data_path']
+active_routes_count_list= config['leaf1']['active_routes_count']
+print(active_routes_count_list)
 
 print(path)
         # returns all file having pattern from a path provided
