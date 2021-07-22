@@ -55,4 +55,4 @@ if __name__ == "__main__":
         producer_leaf1.send("data_plane", key=bytes(record_leaf1["key"], 'utf-8'), value=record_leaf1)
         #producer_leaf2.send("data_plane", key=bytes(record_leaf2["key"], 'utf-8'), value=record_leaf2)
 
-        time.sleep(10)
+        time.sleep(50)

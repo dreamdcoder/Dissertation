@@ -43,13 +43,14 @@ def udf_ml_model(feat1, feat2, feat3, feat4, feat5, feat6, feat7, feat8, feat9, 
                     'protocol_route_memory': 'float64', 'total_neighbors_count': 'float64',
                     'vrf_path_count': 'float64', 'vrf_update_messages_received': 'float64'})
     key = df["key"][0]
+    print(key)
     # load scaler file
     #print(type(key), key)
     scaler_file_name = key + "_scaler.pkl"
     spath = os.path.join(path, scaler_file_name)
+    #if os.path.isfile(spath):
     with open(spath, 'rb') as f:
         scaler = pickle.load(f)
-
     # load model file
     model_file_name = key + "_model.pkl"
     mpath = os.path.join(path, model_file_name)
@@ -61,9 +62,8 @@ def udf_ml_model(feat1, feat2, feat3, feat4, feat5, feat6, feat7, feat8, feat9, 
     df_new_scaled = scaler.transform(df_new)
     # apply model
     y_pred_outliers = model.predict(df_new_scaled)
-    #if y_pred_outliers == -1:
-        #solution= get_solution(key,'BGP Anomaly')
     return int(y_pred_outliers)
+    #else:return 1
 
 def udf_solution(key,anomaly):
     solution = '-'
@@ -78,7 +78,7 @@ def udf_solution(key,anomaly):
     return solution
 
 
-
+checkpointDirectory= 'C:\\Users\\yogeshja\\Desktop\\Dissertation\\checkpoint'
 
 # Build a spark session
 spark = SparkSession \
@@ -156,14 +156,17 @@ def process_row(batch_df, epoch_id):
 
 query = raw_df \
     .writeStream \
-    .trigger(processingTime='10 seconds') \
+    .trigger(processingTime='20 seconds') \
     .foreachBatch(process_row) \
+    .option("checkpointLocation","hdfs://localhost:9000/checkpoint")\
     .start()
+
+#.option("checkpointLocation","hdfs://localhost:9000/checkpoint")\
 
 '''query = raw_df \
     .writeStream \
     .outputMode("append") \
-    .trigger(processingTime='10 seconds') \
+    .trigger(processingTime='50 seconds') \
     .format("console") \
     .start()'''
 
