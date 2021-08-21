@@ -158,9 +158,8 @@ query = raw_df \
     .writeStream \
     .trigger(processingTime='20 seconds') \
     .foreachBatch(process_row) \
-    .option("checkpointLocation","hdfs://localhost:9000/checkpoint")\
     .start()
-
+#.option("checkpointLocation","hdfs://localhost:9000/checkpoint")\
 #.option("checkpointLocation","hdfs://localhost:9000/checkpoint")\
 
 '''query = raw_df \

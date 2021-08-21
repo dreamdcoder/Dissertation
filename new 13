@@ -1,0 +1,8 @@
+select count(*),syncdifftype.name,syncdifftypeid,provisionstatus.name from syncdiff,syncdifftype,provisionstatus where syncdiff2requestinstance = 171704500
+and SYNCDIFF2SYNCDIFFTYPE =syncdifftypeid
+and syncdiff2provisionstatus =provisionstatusid
+group by syncdifftype.name,syncdifftypeid,provisionstatus.name
+
+
+select * from syncdiff where syncdiff2requestinstance =171704500
+and SYNCDIFF2SYNCDIFFTYPE =140000
